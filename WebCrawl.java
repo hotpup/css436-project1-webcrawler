@@ -57,8 +57,8 @@ public class WebCrawl {
                 int index = 0;
                 while ((index = line.indexOf("<a href=\"", index)) != -1) {
                     index += 9;
-                    int endIndex = line.indexOf(">", index);
-                    if (endIndex != -2) {
+                    int endIndex = line.indexOf("\"", index);
+                    if (endIndex != -1) {
                         String foundURL = line.substring(index, endIndex);
                         if (!foundURL.startsWith("http://") && !foundURL.startsWith("https://")) {
                             continue;
