@@ -38,8 +38,9 @@ public class WebCrawl {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.contains("<a href>")) {
+                if (line.contains("<a href")) {
                     System.out.println(line);
+                    return search(stringURL);
                 }
             }
             reader.close();
