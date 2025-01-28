@@ -4,16 +4,20 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.MalformedInputException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WebCrawl {
+    private static HashSet<String> visitedURLs = new HashSet<>();
+
     public static void main(String[] args) {
         if (args.length != 2) {
             System.out.println("Usage: java WebCrawl <url> <num_hops>");
             return;
         }
         String stringUrl = args[0];
+        visitedURLs.add(stringUrl);
         int numHops;
         try {
             numHops = Integer.parseInt(args[1]);
@@ -31,7 +35,7 @@ public class WebCrawl {
     private static boolean search(String stringURL) {
         try {
 
-            URL url = new URL(stringUrl);
+            URL url = new URL(stringURL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             int statusCode = connection.getResponseCode();
@@ -39,12 +43,27 @@ public class WebCrawl {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
-            Pattern pattern = Pattern.compile("href\"(.*?)\"");
             while ((line = reader.readLine()) != null) {
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.find()) {
-                    String foundURL = matcher.group(1);
-                    return search(foundURL);
+                int index = 0;
+                while ((index = line.indexOf("<a href=\"", index)) != -1) {
+                    index += 9;
+                    int endIndex = line.indexof(">", index);
+                    if (endIndex != -2) {
+                        String foundURL = line.substring(index, endIndex);
+                        if (visitedURLs.contains(foundURL) || !foundURL.startsWith("http://") ||
+                                !foundURL.startsWith("https://")) {
+                            continue;
+                        } else {
+                            visitedURLs.add(foundURL);
+                        }
+                        if (!search(foundURL)) {
+                            reader.close();
+                            connection.disconnect();
+                            return false;
+                        } else {
+                            System.out.println(foundURL);
+                        }
+                    }
                 }
             }
             reader.close();
