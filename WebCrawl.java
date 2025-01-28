@@ -46,7 +46,7 @@ public class WebCrawl {
                     return search(newURL);
                 }
             } else if (statusCode >= 400) {
-                System.out.println("Error: " + statusCode + " fore URL: " + stringURL);
+                System.out.println("Error: " + statusCode + " for URL: " + stringURL);
                 return false;
             }
 
