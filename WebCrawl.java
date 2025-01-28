@@ -67,6 +67,7 @@ public class WebCrawl {
                             continue;
                         }
 
+                        visitedURLs.add(foundURL);
                         System.out.println("Visiting: " + foundURL);
 
                         if (!search(foundURL)) {
