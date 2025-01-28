@@ -86,6 +86,7 @@ public class WebCrawl {
                     }
                 }
             }
+            System.out.println("No new links found");
             reader.close();
             connection.disconnect();
         } catch (MalformedInputException e) {
