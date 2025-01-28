@@ -19,6 +19,11 @@ public class WebCrawl {
             System.out.println(e.getMessage());
             return;
         }
+
+        search(stringUrl);
+    }
+
+    private static void search(String stringURL) {
         try {
 
             URL url = new URL(stringUrl);
@@ -30,7 +35,9 @@ public class WebCrawl {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                if (line.contains("<a href>")) {
+                    System.out.println(line);
+                }
             }
             reader.close();
             connection.disconnect();
