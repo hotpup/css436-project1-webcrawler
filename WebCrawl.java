@@ -8,7 +8,7 @@ import java.nio.charset.MalformedInputException;
 public class WebCrawl {
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.out.println("Usage: java Webcrawler <url> <num_hops>");
+            System.out.println("Usage: java WebCrawl <url> <num_hops>");
             return;
         }
         String stringUrl = args[0];
@@ -16,7 +16,7 @@ public class WebCrawl {
         try {
             numHops = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            System.out.println(e.getMessage());
+            System.out.println("The second argument must be an integer.");
             return;
         }
         for (int i = 0; i < numHops; i++) {
@@ -33,23 +33,25 @@ public class WebCrawl {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             int statusCode = connection.getResponseCode();
-            System.out.println(statusCode);
+            System.out.println("HTTP Status Code: " + statusCode);
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
+            Pattern pattern = Pattern.compile("href\"(.*?)\"");
             while ((line = reader.readLine()) != null) {
-                if (line.contains("<a href")) {
-                    System.out.println(line);
-                    return search(stringURL);
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find()) {
+                    String foundURL = matcher.group(1);
+                    return search(foundURL);
                 }
             }
             reader.close();
             connection.disconnect();
         } catch (MalformedInputException e) {
-            System.out.println(e.getMessage());
+            System.out.println("The URL is malformed: " + e.getMessage());
             return false;
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("An I/O error occurred: " + e.getMessage());
             return false;
         }
         return true;
