@@ -1,3 +1,5 @@
+
+// Caleb Chun
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,11 +36,20 @@ public class WebCrawl {
 
     private static boolean search(String stringURL) {
         try {
-
             URL url = new URL(stringURL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setInstanceFollowRedirects(true);
 
             int statusCode = connection.getResponseCode();
+            if (statusCode >= 300 && statusCode < 400) {
+                String newURL = connection.getHeaderField("Location");
+                if (newURL != null) {
+                    return search(newURL);
+                }
+            } else if (statusCode >= 400) {
+                System.out.println("Error: " + statusCode + " fore URL: " + stringURL);
+                return false;
+            }
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
@@ -49,17 +60,23 @@ public class WebCrawl {
                     int endIndex = line.indexOf(">", index);
                     if (endIndex != -2) {
                         String foundURL = line.substring(index, endIndex);
-                        if (visitedURLs.contains(foundURL) || !foundURL.startsWith("http://") ||
-                                !foundURL.startsWith("https://")) {
+                        if (!foundURL.startsWith("http://") && !foundURL.startsWith("https://")) {
                             continue;
-                        } else {
-                            visitedURLs.add(foundURL);
                         }
+                        if (visitedURLs.contains(foundURL)) {
+                            continue;
+                        }
+
                         System.out.println("Visiting: " + foundURL);
+
                         if (!search(foundURL)) {
                             reader.close();
                             connection.disconnect();
                             return false;
+                        } else {
+                            reader.close();
+                            connection.disconnect();
+                            return true;
                         }
                     }
                 }
