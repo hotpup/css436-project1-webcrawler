@@ -19,11 +19,14 @@ public class WebCrawl {
             System.out.println(e.getMessage());
             return;
         }
-
-        search(stringUrl);
+        for (int i = 0; i < numHops; i++) {
+            if (!search(stringUrl)) {
+                return;
+            }
+        }
     }
 
-    private static void search(String stringURL) {
+    private static boolean search(String stringURL) {
         try {
 
             URL url = new URL(stringUrl);
@@ -43,8 +46,11 @@ public class WebCrawl {
             connection.disconnect();
         } catch (MalformedInputException e) {
             System.out.println(e.getMessage());
+            return false;
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            return false;
         }
+        return true;
     }
 }
