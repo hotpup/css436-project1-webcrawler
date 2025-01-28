@@ -39,7 +39,6 @@ public class WebCrawl {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             int statusCode = connection.getResponseCode();
-            System.out.println("HTTP Status Code: " + statusCode);
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line;
@@ -47,7 +46,7 @@ public class WebCrawl {
                 int index = 0;
                 while ((index = line.indexOf("<a href=\"", index)) != -1) {
                     index += 9;
-                    int endIndex = line.indexof(">", index);
+                    int endIndex = line.indexOf(">", index);
                     if (endIndex != -2) {
                         String foundURL = line.substring(index, endIndex);
                         if (visitedURLs.contains(foundURL) || !foundURL.startsWith("http://") ||
@@ -56,12 +55,11 @@ public class WebCrawl {
                         } else {
                             visitedURLs.add(foundURL);
                         }
+                        System.out.println("Visiting: " + foundURL);
                         if (!search(foundURL)) {
                             reader.close();
                             connection.disconnect();
                             return false;
-                        } else {
-                            System.out.println(foundURL);
                         }
                     }
                 }
