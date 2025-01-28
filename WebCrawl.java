@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 public class WebCrawl {
     private static HashSet<String> visitedURLs = new HashSet<>();
+    private static int numHops;
 
     public static void main(String[] args) {
         if (args.length != 2) {
@@ -20,17 +21,15 @@ public class WebCrawl {
         }
         String stringUrl = args[0];
         visitedURLs.add(stringUrl);
-        int numHops;
         try {
             numHops = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
             System.out.println("The second argument must be an integer.");
             return;
         }
-        for (int i = 0; i < numHops; i++) {
-            if (!search(stringUrl)) {
-                return;
-            }
+
+        if (!search(stringUrl) && numHops > 1) {
+            return;
         }
     }
 
@@ -69,6 +68,11 @@ public class WebCrawl {
 
                         visitedURLs.add(foundURL);
                         System.out.println("Visiting: " + foundURL);
+                        numHops -= 1;
+
+                        if (numHops <= -1) {
+                            return false;
+                        }
 
                         if (!search(foundURL)) {
                             reader.close();
